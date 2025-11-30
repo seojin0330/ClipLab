@@ -49,8 +49,11 @@ Python이 없다면 먼저 설치하세요
 
 1.CMD 또는 PowerShell을 관리자 권한으로 실행
 
-2.명령어 입력: winget install ffmpeg
+2.명령어 입력: 
 
+```bash
+winget install ffmpeg
+```
 설치 확인:
 
 ```bash
