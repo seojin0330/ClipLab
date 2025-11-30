@@ -94,34 +94,117 @@ def convert():
     messagebox.showinfo("알림", "변환이 완료되었습니다!")
 
 def merge():
-    files = filedialog.askopenfilenames(title="합칠 영상 선택")
-    if not files:
-        return
+    # 합치기 UI 윈도우 생성
+    merge_window = tk.Toplevel(root)
+    merge_window.title("영상 합치기")
+    merge_window.geometry("400x500")
 
-    # 리스트 파일 만들기
-    f = open("list.txt", "w", encoding="utf-8")
-    for file in files:
-        path = file.replace("\\", "/")
-        f.write(f"file '{path}'\n")
-    f.close()
+    # 파일 리스트 저장용 변수
+    merge_files = []
 
-    # 저장할 이름
-    save_name = filedialog.asksaveasfilename(title="저장할 이름", defaultextension=".mp4")
-    if not save_name:
-        return
+    # 리스트박스 업데이트 함수
+    def update_listbox():
+        listbox.delete(0, tk.END)
+        for file in merge_files:
+            listbox.insert(tk.END, os.path.basename(file))
 
-    # 합치기 명령어
-    cmd = f'ffmpeg -f concat -safe 0 -i list.txt -c copy "{save_name}"'
-    run_ffmpeg(cmd)
+    # 파일 추가 함수
+    def add_files():
+        files = filedialog.askopenfilenames(title="합칠 영상 선택", filetypes=[("Video files", "*.mp4;*.avi;*.mov;*.mkv")])
+        if files:
+            for file in files:
+                merge_files.append(file)
+            update_listbox()
 
-    # 리스트 파일 삭제
-    os.remove("list.txt")
-    messagebox.showinfo("알림", "합치기 완료!")
+    # 선택 삭제 함수
+    def remove_file():
+        selection = listbox.curselection()
+        if selection:
+            index = selection[0]
+            del merge_files[index]
+            update_listbox()
+
+    # 위로 이동 함수
+    def move_up():
+        selection = listbox.curselection()
+        if selection:
+            index = selection[0]
+            if index > 0:
+                merge_files[index], merge_files[index-1] = merge_files[index-1], merge_files[index]
+                update_listbox()
+                listbox.selection_set(index-1)
+
+    # 아래로 이동 함수
+    def move_down():
+        selection = listbox.curselection()
+        if selection:
+            index = selection[0]
+            if index < len(merge_files) - 1:
+                merge_files[index], merge_files[index+1] = merge_files[index+1], merge_files[index]
+                update_listbox()
+                listbox.selection_set(index+1)
+
+    # 합치기 실행 함수
+    def run_merge_process():
+        if not merge_files:
+            messagebox.showwarning("경고", "합칠 영상을 추가해주세요.")
+            return
+
+        # 저장할 이름
+        save_name = filedialog.asksaveasfilename(title="저장할 이름", defaultextension=".mp4")
+        if not save_name:
+            return
+
+        # 리스트 파일 만들기
+        try:
+            with open("list.txt", "w", encoding="utf-8") as f:
+                for file in merge_files:
+                    path = file.replace("\\", "/")
+                    f.write(f"file '{path}'\n")
+            
+            # 합치기 명령어
+            cmd = f'ffmpeg -f concat -safe 0 -i list.txt -c copy "{save_name}"'
+            run_ffmpeg(cmd)
+
+            # 리스트 파일 삭제
+            if os.path.exists("list.txt"):
+                os.remove("list.txt")
+            
+            messagebox.showinfo("알림", "합치기 완료!")
+            merge_window.destroy()
+            
+        except Exception as e:
+            messagebox.showerror("에러", f"오류가 발생했습니다: {str(e)}")
+
+    # UI 구성
+    frame_list = tk.Frame(merge_window)
+    frame_list.pack(pady=10, padx=10, fill=tk.BOTH, expand=True)
+
+    scrollbar = tk.Scrollbar(frame_list)
+    scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
+
+    listbox = tk.Listbox(frame_list, selectmode=tk.SINGLE, yscrollcommand=scrollbar.set)
+    listbox.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
+    scrollbar.config(command=listbox.yview)
+
+    frame_btns = tk.Frame(merge_window)
+    frame_btns.pack(pady=5)
+
+    tk.Button(frame_btns, text="파일 추가", command=add_files).pack(side=tk.LEFT, padx=5)
+    tk.Button(frame_btns, text="선택 삭제", command=remove_file).pack(side=tk.LEFT, padx=5)
+    
+    frame_move = tk.Frame(merge_window)
+    frame_move.pack(pady=5)
+    
+    tk.Button(frame_move, text="▲ 위로", command=move_up).pack(side=tk.LEFT, padx=5)
+    tk.Button(frame_move, text="▼ 아래로", command=move_down).pack(side=tk.LEFT, padx=5)
+
+    tk.Button(merge_window, text="합치기 실행", command=run_merge_process, height=2, bg="lightblue").pack(pady=20, fill=tk.X, padx=20)
 
 # GUI
 root = tk.Tk()
-root.title("클립랩(ClipLab) V1.3")
-root.geometry("350x450")
+root.title("클립랩(ClipLab) V1.4")
+root.geometry("350x480")
 
 tk.Label(root, text="클립랩(ClipLab)", font=("맑은 고딕", 15)).pack(pady=10)
 
