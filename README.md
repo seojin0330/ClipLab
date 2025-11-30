@@ -30,7 +30,7 @@
 
 ## 📦 설치 방법
 
-https://youtu.be/ZU6AWa_b14Y
+설치 및 실행 영상 가이드 : https://youtu.be/ZU6AWa_b14Y
 
 ### 1️⃣ Python 설치
 
