@@ -16,20 +16,16 @@ def get_duration(file_path):
         return int(h) * 3600 + int(m) * 60 + float(s)
     return 0
 
-# ffmpeg 명령어 실행 함수 (진행률 표시 포함)
+# ffmpeg 명령어 실행 함수
 def run_ffmpeg(cmd, total_duration=None):
     print(cmd)
-    
     process = subprocess.Popen(cmd, shell=True, stderr=subprocess.PIPE, text=True, encoding='utf-8', errors='replace')
-    
     while True:
         line = process.stderr.readline()
         if not line and process.poll() is not None:
             break
-        
         if line:
-            print(line.strip()) # 디버깅용 출력
-            # time=00:00:05.20
+            print(line.strip())
             if total_duration and "time=" in line:
                 match = re.search(r"time=(\d{2}):(\d{2}):(\d{2}\.\d{2})", line)
                 if match:
@@ -39,7 +35,6 @@ def run_ffmpeg(cmd, total_duration=None):
                     progress_var.set(progress)
                     progress_label.config(text=f"{progress:.1f}%")
                     root.update()
-    
     progress_var.set(0)
     progress_label.config(text="대기 중")
 
@@ -182,7 +177,7 @@ def merge():
         except Exception as e:
             messagebox.showerror("에러", f"오류가 발생했습니다: {str(e)}")
 
-    # UI 구성
+    # UI 합치기 구성
     frame_list = tk.Frame(merge_window)
     frame_list.pack(pady=10, padx=10, fill=tk.BOTH, expand=True)
 
