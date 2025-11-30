@@ -62,7 +62,7 @@ winget install ffmpeg
 ffmpeg -version
 ```
 
-버전이 나오면 성공 ✅
+버전이 나오면 성공
 
 ---
 
