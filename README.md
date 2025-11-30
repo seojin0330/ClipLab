@@ -32,6 +32,7 @@
 
 설치 및 실행 영상 가이드 : https://youtu.be/ZU6AWa_b14Y
 ![설치방법](https://github.com/user-attachments/assets/7a8384fb-d0f6-4abc-bc60-8736a17c41a2)
+⬆️용량으로 인해 영상이 끊어졌습니다 실행 단계부터는 윗 유튜브 링크로 확인해주세요
 
 ### 1️⃣ Python 설치
 
