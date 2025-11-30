@@ -26,6 +26,7 @@ def convert():
     s = size_var.get()
     f_fps = fps_var.get()
     c = codec_var.get()
+    b_rate = bitrate_var.get()
 
     for file in files:
         # 파일 이름이랑 경로 분리
@@ -33,7 +34,7 @@ def convert():
         name, ext = os.path.splitext(filename)
         
         # 저장할 경로 만들기
-        output_file = os.path.join(save_folder, name + "_new.mp4")
+        output_file = os.path.join(save_folder, name + "_converted.mp4")
 
         # 필터 만들기
         filter_list = []
@@ -56,21 +57,36 @@ def convert():
             filter_list.append(f"fps={f_fps}")
 
         # 필터 합치기
-        if len(filter_list) > 0:
-            vf = "-vf " + ",".join(filter_list)
-        else:
-            vf = ""
+        filter_str = ",".join(filter_list) if filter_list else ""
 
         # 코덱 설정
         if c == "H.264":
-            codec = "-c:v libx264 -crf 18"
+            codec_str = "libx264"
         elif c == "HEVC":
-            codec = "-c:v libx265 -crf 23"
+            codec_str = "libx265"
         else:
-            codec = "-c:v libx264 -crf 18"
+            codec_str = "libx264"
 
-        # 명령어 만들기
-        cmd = f'ffmpeg -i "{file}" {vf} {codec} -c:a copy "{output_file}"'
+        # 비트레이트 설정
+        bitrate_str = ""
+        if b_rate != "변경 안함":
+            bitrate_value = b_rate.replace("bps", "").lower()
+            bitrate_str = f"-b:v {bitrate_value}"
+
+        # ffmpeg 명령어 만들기
+        cmd_parts = [f'ffmpeg -i "{file}"']
+        
+        if filter_str:
+            cmd_parts.append(f'-vf "{filter_str}"')
+        
+        cmd_parts.append(f'-c:v {codec_str}')
+        
+        if bitrate_str:
+            cmd_parts.append(bitrate_str)
+        
+        cmd_parts.append(f'-c:a copy "{output_file}"')
+        
+        cmd = " ".join(cmd_parts)
         
         # 실행
         run_ffmpeg(cmd)
@@ -104,7 +120,7 @@ def merge():
 
 # GUI
 root = tk.Tk()
-root.title("클립랩(ClipLab) V1.2")
+root.title("클립랩(ClipLab) V1.3")
 root.geometry("350x450")
 
 tk.Label(root, text="클립랩(ClipLab)", font=("맑은 고딕", 15)).pack(pady=10)
@@ -136,6 +152,13 @@ codec_var = tk.StringVar()
 codec_combo = ttk.Combobox(root, textvariable=codec_var, values=["H.264", "HEVC"])
 codec_combo.set("H.264")
 codec_combo.pack()
+
+# 비트레이트 옵션
+tk.Label(root, text="비트레이트 설정").pack()
+bitrate_var = tk.StringVar()
+bitrate_combo = ttk.Combobox(root, textvariable=bitrate_var, values=["변경 안함", "10Mbps", "5Mbps", "2Mbps", "1Mbps", "500Kbps"])
+bitrate_combo.set("변경 안함")
+bitrate_combo.pack()
 
 # 버튼
 tk.Button(root, text="변환하기", command=convert, width=20, height=2).pack(pady=20)
