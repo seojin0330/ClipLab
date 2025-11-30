@@ -45,6 +45,12 @@ Python이 없다면 먼저 설치하세요
 
 2. 압축을 푼 뒤 `bin` 폴더 경로를 환경변수(Path)에 추가
 
+또는
+
+1.CMD 또는 PowerShell을 관리자 권한으로 실행
+
+2.명령어 입력: winget install ffmpeg
+
 설치 확인:
 
 ```bash
