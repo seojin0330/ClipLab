@@ -30,6 +30,8 @@
 
 ## 📦 설치 방법
 
+https://youtu.be/ZU6AWa_b14Y
+
 ### 1️⃣ Python 설치
 
 Python이 없다면 먼저 설치하세요
