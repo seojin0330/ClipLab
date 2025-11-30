@@ -85,7 +85,7 @@ cd ClipLab
 ### 기본 실행
 
 ```bash
-python main.py
+python ClipLab.py
 ```
 
 프로그램이 실행되면:
